@@ -1,0 +1,33 @@
+{
+  "name": "farm-issue-v3-api",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf build",
+    "start": "tsc && node ./build/index.js",
+    "start:dev": "nodemon src/index.ts",
+    "lint": "tsc --noEmit && TIMING=1 eslint src/**/*.ts* --fix",
+    "typechain": "typechain --out-dir src/blockchain/abi/types --target=ethers-v5 \"src/blockchain/abi/*.json\"",
+    "test": "NODE_ENV=test jest --verbose --runInBand"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@typechain/ethers-v5": "^9.0.0",
+    "ethers": "^5.7.2",
+    "abi-decoder": "^2.4.0",
+    "dayjs": "1.11.6",
+    "typechain": "^7.0.0",
+    "graphql": "^15.5.0",
+    "graphql-request": "^3.5.0",
+    "mongoose": "^6.9.2",
+    "mongoose-paginate-v2": "^1.4.2",
+    "csv-parse": "^5.3.9"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "@types/mongoose-paginate-v2": "^1.4.0",
+    "typescript": "^4.5.3"
+  }
+}
