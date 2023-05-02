@@ -1,7 +1,6 @@
 import path from "path";
 import * as fs from "fs";
-import { parse, Callback, CastingFunction } from "csv-parse";
-import { IncreaseLiquidityFunction } from "../model/farmFunctions";
+import { parse, CastingFunction, Parser } from "csv-parse";
 import { getModel, ModelType } from "../db/mongodb/mongo";
 
 const defaultCast: CastingFunction = (columnValue, context) => {
@@ -12,28 +11,25 @@ const defaultCast: CastingFunction = (columnValue, context) => {
   return columnValue;
 };
 
-const commonParseCsv = (
+const getCommonParser = async (
   pathToFile: string,
   headers: string[],
-  callback: Callback,
   cast?: CastingFunction
-) => {
+): Promise<Parser> => {
   const csvFilePath = path.resolve(pathToFile);
   const fileContent = fs.readFileSync(csvFilePath, { encoding: "utf-8" });
 
-  parse(
-    fileContent,
-    {
-      delimiter: ",",
-      columns: headers,
-      fromLine: 2,
-      cast: cast || defaultCast,
-    },
-    callback
-  );
+  return parse(fileContent, {
+    delimiter: ",",
+    columns: headers,
+    fromLine: 2,
+    cast: cast || defaultCast,
+  });
 };
 
 export const storeParsedIncreaseLiquidityCsv = async () => {
+  console.log(`storeParsedIncreaseLiquidityCsv started`);
+
   const pathToFile = "input/bsc/increaseLiquidityFunctionCall.csv";
   const headers = [
     "tx",
@@ -45,31 +41,50 @@ export const storeParsedIncreaseLiquidityCsv = async () => {
     "params",
   ];
 
-  const callback: Callback = async (
-    error,
-    result: IncreaseLiquidityFunction[]
-  ) => {
-    if (error) {
-      console.error(error);
-    }
+  let counter = 0;
 
-    const ilModel = await getModel(ModelType.increaseLiquidity);
+  const ilModel = await getModel(ModelType.increaseLiquidity);
 
-    for (const callData of result) {
-      try {
-        if (!callData.output_amount0) {
-          console.log("here", callData.tx, callData.output_amount0);
-        }
-        await ilModel.create(callData);
-      } catch (e) {
-        if (e instanceof Error) {
-          console.error(e.message);
-        }
+  const parser = await getCommonParser(pathToFile, headers);
+  for await (const record of parser) {
+    try {
+      await ilModel.create(record);
+      counter++;
+    } catch (err) {
+      if (err instanceof Error) {
+        // console.error(err.message);
       }
     }
+  }
 
-    console.log("Result", result[0].timestamp);
-  };
+  console.log(`storeParsedIncreaseLiquidityCsv finished. Added: ${counter}`);
+};
+export const storeParsedDecreaseLiquidityCsv = async () => {
+  console.log(`storeParsedDecreaseLiquidityCsv started`);
 
-  commonParseCsv(pathToFile, headers, callback);
+  const pathToFile = "input/bsc/decreaseLiquidityFunctionCall.csv";
+  const headers = [
+    "tx",
+    "timestamp",
+    "block",
+    "output_amount0",
+    "output_amount1",
+    "params",
+  ];
+
+  let counter = 0;
+  const dlModel = await getModel(ModelType.decreaseLiquidity);
+
+  const parser = await getCommonParser(pathToFile, headers);
+  for await (const record of parser) {
+    try {
+      await dlModel.create(record);
+      counter++;
+    } catch (err) {
+      if (err instanceof Error) {
+        // console.error(err.message);
+      }
+    }
+  }
+  console.log(`storeParsedDecreaseLiquidityCsv finished. Added: ${counter}`);
 };

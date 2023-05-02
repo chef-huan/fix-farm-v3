@@ -1,7 +1,13 @@
-import { storeParsedIncreaseLiquidityCsv } from "./service/parseCsv";
+import {
+  storeParsedDecreaseLiquidityCsv,
+  storeParsedIncreaseLiquidityCsv,
+} from "./service/parseCsv";
 
 const init = async () => {
-  await storeParsedIncreaseLiquidityCsv();
+  await Promise.all([
+    storeParsedIncreaseLiquidityCsv(),
+    storeParsedDecreaseLiquidityCsv(),
+  ]);
 };
 
 init().then(() => {

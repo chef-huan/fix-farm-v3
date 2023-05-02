@@ -1,6 +1,7 @@
 import mongoose, { Connection, ConnectOptions, Model } from "mongoose";
 import { getUpdateLiquiditySchema } from "./schemas/updateLiquidity.schema";
 import { getIncreaseLiquiditySchema } from "./schemas/increaseLiquidity.schema";
+import { getDecreaseLiquiditySchema } from "./schemas/decreaseLiquidity.schema";
 
 let connection: Connection | null = null;
 
@@ -36,6 +37,7 @@ export const getConnection = async (): Promise<Connection> => {
     connection = await mongoose.createConnection(uri, options).asPromise();
 
     connection.model(ModelType.increaseLiquidity, getIncreaseLiquiditySchema());
+    connection.model(ModelType.decreaseLiquidity, getDecreaseLiquiditySchema());
     connection.model(ModelType.updateLiquidity, getUpdateLiquiditySchema());
   }
 

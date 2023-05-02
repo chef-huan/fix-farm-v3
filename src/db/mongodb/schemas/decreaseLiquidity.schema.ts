@@ -16,17 +16,11 @@ export const getDecreaseLiquiditySchema = (): Schema => {
         type: Number,
         required: true,
       },
-      tokenId: {
-        type: String,
-        required: true,
-      },
       output_amount0: {
         type: String,
-        required: true,
       },
       output_amount1: {
         type: String,
-        required: true,
       },
       params: {
         type: String,
@@ -41,6 +35,8 @@ export const getDecreaseLiquiditySchema = (): Schema => {
       collection: ModelType.decreaseLiquidity,
     }
   );
+
+  schema.index({ tx: 1, params: 1 }, { unique: true });
 
   return schema;
 };
