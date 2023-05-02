@@ -6,29 +6,31 @@ export const getUpdateLiquiditySchema = (): Schema => {
     {
       tx: {
         type: String,
-        required: true
+        required: true,
       },
       block: {
         type: Number,
-        required: true
+        required: true,
       },
       timestamp: {
         type: Number,
-        required: true
+        required: true,
       },
       tokenId: {
         type: String,
-        required: true
+        required: true,
       },
       created_at: {
         type: Date,
-        default: Date.now
-      }
+        default: Date.now,
+      },
     },
     {
-      collection: ModelType.updateLiquidity
+      collection: ModelType.updateLiquidity,
     }
   );
+
+  schema.index({ tx: 1, tokenId: 1 }, { unique: true });
 
   return schema;
 };

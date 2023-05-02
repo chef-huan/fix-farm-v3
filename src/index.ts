@@ -1,15 +1,15 @@
-import {
-  storeParsedDecreaseLiquidityCsv,
-  storeParsedIncreaseLiquidityCsv,
-} from "./service/parseCsv";
+import { storeParsedCsv } from "./service/parseCsv";
+import { ModelType } from "./db/mongodb/mongo";
 
 const init = async () => {
+  console.log("Init");
   await Promise.all([
-    storeParsedIncreaseLiquidityCsv(),
-    storeParsedDecreaseLiquidityCsv(),
+    storeParsedCsv(ModelType.updateLiquidity),
+    storeParsedCsv(ModelType.increaseLiquidity),
+    storeParsedCsv(ModelType.decreaseLiquidity),
   ]);
 };
 
 init().then(() => {
-  console.log("done");
+  console.log("Init finished");
 });

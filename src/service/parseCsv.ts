@@ -3,6 +3,37 @@ import * as fs from "fs";
 import { parse, CastingFunction, Parser } from "csv-parse";
 import { getModel, ModelType } from "../db/mongodb/mongo";
 
+const map = new Map<string, { pathToFile: string; headers: string[] }>();
+map.set(ModelType.updateLiquidity, {
+  pathToFile: "input/bsc/updateLiquidityFunctionCall.csv",
+  headers: ["tx", "timestamp", "block", "tokenId"],
+});
+
+map.set(ModelType.increaseLiquidity, {
+  pathToFile: "input/bsc/increaseLiquidityFunctionCall.csv",
+  headers: [
+    "tx",
+    "timestamp",
+    "block",
+    "output_amount0",
+    "output_amount1",
+    "output_liquidity",
+    "params",
+  ],
+});
+
+map.set(ModelType.decreaseLiquidity, {
+  pathToFile: "input/bsc/decreaseLiquidityFunctionCall.csv",
+  headers: [
+    "tx",
+    "timestamp",
+    "block",
+    "output_amount0",
+    "output_amount1",
+    "params",
+  ],
+});
+
 const defaultCast: CastingFunction = (columnValue, context) => {
   if (context.column === "timestamp") {
     const data = new Date(columnValue);
@@ -27,28 +58,24 @@ const getCommonParser = async (
   });
 };
 
-export const storeParsedIncreaseLiquidityCsv = async () => {
-  console.log(`storeParsedIncreaseLiquidityCsv started`);
+export const storeParsedCsv = async (
+  type: ModelType,
+  cast?: CastingFunction
+) => {
+  console.log(`storeParsedCsv started. type: ${type}`);
 
-  const pathToFile = "input/bsc/increaseLiquidityFunctionCall.csv";
-  const headers = [
-    "tx",
-    "timestamp",
-    "block",
-    "output_amount0",
-    "output_amount1",
-    "output_liquidity",
-    "params",
-  ];
+  const data = map.get(type);
+  if (!data) {
+    throw Error(`Undefined type ${type}`);
+  }
 
   let counter = 0;
+  const model = await getModel(type);
 
-  const ilModel = await getModel(ModelType.increaseLiquidity);
-
-  const parser = await getCommonParser(pathToFile, headers);
+  const parser = await getCommonParser(data.pathToFile, data.headers, cast);
   for await (const record of parser) {
     try {
-      await ilModel.create(record);
+      await model.create(record);
       counter++;
     } catch (err) {
       if (err instanceof Error) {
@@ -57,34 +84,5 @@ export const storeParsedIncreaseLiquidityCsv = async () => {
     }
   }
 
-  console.log(`storeParsedIncreaseLiquidityCsv finished. Added: ${counter}`);
-};
-export const storeParsedDecreaseLiquidityCsv = async () => {
-  console.log(`storeParsedDecreaseLiquidityCsv started`);
-
-  const pathToFile = "input/bsc/decreaseLiquidityFunctionCall.csv";
-  const headers = [
-    "tx",
-    "timestamp",
-    "block",
-    "output_amount0",
-    "output_amount1",
-    "params",
-  ];
-
-  let counter = 0;
-  const dlModel = await getModel(ModelType.decreaseLiquidity);
-
-  const parser = await getCommonParser(pathToFile, headers);
-  for await (const record of parser) {
-    try {
-      await dlModel.create(record);
-      counter++;
-    } catch (err) {
-      if (err instanceof Error) {
-        // console.error(err.message);
-      }
-    }
-  }
-  console.log(`storeParsedDecreaseLiquidityCsv finished. Added: ${counter}`);
+  console.log(`storeParsedCsv finished. type: ${type}. added rows: ${counter}`);
 };
