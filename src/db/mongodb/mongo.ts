@@ -19,7 +19,7 @@ export const getConnection = async (): Promise<Connection> => {
   if (connection === null) {
     /* istanbul ignore next */
     const uri =
-      process.env.MONGO_URI ?? "mongodb://localhost:27017/marketplace";
+      process.env.MONGO_URI ?? "mongodb://localhost:27017/farm-issue-v3";
     const options: ConnectOptions = {
       // useNewUrlParser: true,
       // useUnifiedTopology: true,

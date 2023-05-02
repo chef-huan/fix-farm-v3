@@ -1,7 +1,9 @@
-import { parseCsv } from "./service/parseCsv";
+import { storeParsedIncreaseLiquidityCsv } from "./service/parseCsv";
 
 const init = async () => {
-  parseCsv("input/bsc/increaseLiquidityFunctionCall.csv");
+  await storeParsedIncreaseLiquidityCsv();
 };
 
-init().then(() => {});
+init().then(() => {
+  console.log("done");
+});

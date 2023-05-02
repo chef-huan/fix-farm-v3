@@ -2,6 +2,7 @@ import path from "path";
 import * as fs from "fs";
 import { parse, Callback, CastingFunction } from "csv-parse";
 import { IncreaseLiquidityFunction } from "../model/farmFunctions";
+import { getModel, ModelType } from "../db/mongodb/mongo";
 
 const defaultCast: CastingFunction = (columnValue, context) => {
   if (context.column === "timestamp") {
@@ -32,7 +33,8 @@ const commonParseCsv = (
   );
 };
 
-export const parseCsv = (pathToFile: string) => {
+export const storeParsedIncreaseLiquidityCsv = async () => {
+  const pathToFile = "input/bsc/increaseLiquidityFunctionCall.csv";
   const headers = [
     "tx",
     "timestamp",
@@ -43,9 +45,27 @@ export const parseCsv = (pathToFile: string) => {
     "params",
   ];
 
-  const callback: Callback = (error, result: IncreaseLiquidityFunction[]) => {
+  const callback: Callback = async (
+    error,
+    result: IncreaseLiquidityFunction[]
+  ) => {
     if (error) {
       console.error(error);
+    }
+
+    const ilModel = await getModel(ModelType.increaseLiquidity);
+
+    for (const callData of result) {
+      try {
+        if (!callData.output_amount0) {
+          console.log("here", callData.tx, callData.output_amount0);
+        }
+        await ilModel.create(callData);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        }
+      }
     }
 
     console.log("Result", result[0].timestamp);
