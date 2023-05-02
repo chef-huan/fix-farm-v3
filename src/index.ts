@@ -1,4 +1,4 @@
-import { storeParsedCsv } from "./service/parseCsv";
+import { storeParsedCsv } from "./service/csv/parseCsv";
 import { ModelType } from "./db/mongodb/mongo";
 
 const init = async () => {
@@ -7,6 +7,7 @@ const init = async () => {
     storeParsedCsv(ModelType.updateLiquidity),
     storeParsedCsv(ModelType.increaseLiquidity),
     storeParsedCsv(ModelType.decreaseLiquidity),
+    storeParsedCsv(ModelType.withdraw),
   ]);
 };
 

@@ -2,6 +2,7 @@ import mongoose, { Connection, ConnectOptions, Model } from "mongoose";
 import { getUpdateLiquiditySchema } from "./schemas/updateLiquidity.schema";
 import { getIncreaseLiquiditySchema } from "./schemas/increaseLiquidity.schema";
 import { getDecreaseLiquiditySchema } from "./schemas/decreaseLiquidity.schema";
+import { getWithdrawSchema } from "./schemas/withdraw.schema";
 
 let connection: Connection | null = null;
 
@@ -14,6 +15,7 @@ export enum ModelType {
   updateLiquidity = "updateLiquidity",
   increaseLiquidity = "increaseLiquidity",
   decreaseLiquidity = "decreaseLiquidity",
+  withdraw = "withdraw",
 }
 
 export const getConnection = async (): Promise<Connection> => {
@@ -39,6 +41,7 @@ export const getConnection = async (): Promise<Connection> => {
     connection.model(ModelType.increaseLiquidity, getIncreaseLiquiditySchema());
     connection.model(ModelType.decreaseLiquidity, getDecreaseLiquiditySchema());
     connection.model(ModelType.updateLiquidity, getUpdateLiquiditySchema());
+    connection.model(ModelType.withdraw, getWithdrawSchema());
   }
 
   return connection;
