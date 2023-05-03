@@ -39,3 +39,8 @@ configMap.set(ModelType.withdraw, {
   pathToFile: "input/bsc/withdrawFunctionCall.csv",
   headers: ["tx", "timestamp", "block", "to", "tokenId", "output_reward"],
 });
+
+configMap.set(ModelType.harvest, {
+  pathToFile: "input/bsc/harvestFunctionCall.csv",
+  headers: ["tx", "timestamp", "block", "to", "tokenId", "output_reward"],
+});

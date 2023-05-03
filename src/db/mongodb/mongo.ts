@@ -3,6 +3,7 @@ import { getUpdateLiquiditySchema } from "./schemas/updateLiquidity.schema";
 import { getIncreaseLiquiditySchema } from "./schemas/increaseLiquidity.schema";
 import { getDecreaseLiquiditySchema } from "./schemas/decreaseLiquidity.schema";
 import { getWithdrawSchema } from "./schemas/withdraw.schema";
+import { getHarvestSchema } from "./schemas/harvest.schema";
 
 let connection: Connection | null = null;
 
@@ -16,6 +17,7 @@ export enum ModelType {
   increaseLiquidity = "increaseLiquidity",
   decreaseLiquidity = "decreaseLiquidity",
   withdraw = "withdraw",
+  harvest = "harvest",
 }
 
 export const getConnection = async (): Promise<Connection> => {
@@ -42,6 +44,7 @@ export const getConnection = async (): Promise<Connection> => {
     connection.model(ModelType.decreaseLiquidity, getDecreaseLiquiditySchema());
     connection.model(ModelType.updateLiquidity, getUpdateLiquiditySchema());
     connection.model(ModelType.withdraw, getWithdrawSchema());
+    connection.model(ModelType.harvest, getHarvestSchema());
   }
 
   return connection;

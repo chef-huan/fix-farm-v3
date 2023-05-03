@@ -8,6 +8,7 @@ const init = async () => {
     storeParsedCsv(ModelType.increaseLiquidity),
     storeParsedCsv(ModelType.decreaseLiquidity),
     storeParsedCsv(ModelType.withdraw),
+    storeParsedCsv(ModelType.harvest),
   ]);
 };
 

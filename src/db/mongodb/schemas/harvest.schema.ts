@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import { ModelType } from "../mongo";
 
-export const getDecreaseLiquiditySchema = (): Schema => {
+export const getHarvestSchema = (): Schema => {
   const schema = new Schema(
     {
       tx: {
@@ -16,15 +16,16 @@ export const getDecreaseLiquiditySchema = (): Schema => {
         type: Number,
         required: true,
       },
-      output_amount0: {
-        type: String,
-      },
-      output_amount1: {
-        type: String,
-      },
-      params: {
+      to: {
         type: String,
         required: true,
+      },
+      tokenId: {
+        type: String,
+        required: true,
+      },
+      output_reward: {
+        type: String,
       },
       user: {
         type: String,
@@ -36,11 +37,14 @@ export const getDecreaseLiquiditySchema = (): Schema => {
       },
     },
     {
-      collection: ModelType.decreaseLiquidity,
+      collection: ModelType.harvest,
     }
   );
 
-  schema.index({ tx: 1, params: 1 }, { unique: true });
+  schema.index(
+    { tx: 1, to: 1, tokenId: 1, output_reward: 1 },
+    { unique: true }
+  );
 
   return schema;
 };

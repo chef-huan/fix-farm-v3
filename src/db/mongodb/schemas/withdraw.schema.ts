@@ -26,6 +26,9 @@ export const getWithdrawSchema = (): Schema => {
       },
       output_reward: {
         type: String,
+      },
+      user: {
+        type: String,
         required: true,
       },
       created_at: {
@@ -34,7 +37,7 @@ export const getWithdrawSchema = (): Schema => {
       },
     },
     {
-      collection: ModelType.updateLiquidity,
+      collection: ModelType.withdraw,
     }
   );
 
