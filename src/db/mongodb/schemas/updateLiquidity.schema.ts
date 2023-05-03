@@ -34,7 +34,7 @@ export const getUpdateLiquiditySchema = (): Schema => {
     }
   );
 
-  schema.index({ tx: 1, tokenId: 1 }, { unique: true });
+  schema.index({ tx: 1, tokenId: 1, user: 1 }, { unique: true });
 
   return schema;
 };

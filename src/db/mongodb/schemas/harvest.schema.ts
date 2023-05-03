@@ -42,7 +42,7 @@ export const getHarvestSchema = (): Schema => {
   );
 
   schema.index(
-    { tx: 1, to: 1, tokenId: 1, output_reward: 1 },
+    { tx: 1, to: 1, tokenId: 1, output_reward: 1, user: 1 },
     { unique: true }
   );
 

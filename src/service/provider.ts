@@ -3,7 +3,8 @@ import { ethers } from "ethers";
 
 export const bscProvider = new StaticJsonRpcProvider(
   {
-    url: "https://nodes.pancakeswap.info",
+    // url: "https://nodes.pancakeswap.info",
+    url: "https://bsc-mainnet.nodereal.io/v1/e6c048300f1246c88c29e3f8655157ab",
     skipFetchSetup: true,
   },
   56

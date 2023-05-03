@@ -1,8 +1,9 @@
 import path from "path";
 import * as fs from "fs";
-import { parse, CastingFunction, Parser } from "csv-parse";
+import { CastingFunction, parse, Parser } from "csv-parse";
 import { getModel, ModelType } from "../../db/mongodb/mongo";
 import { configMap } from "./configCsv";
+import { getUserFromUserPositionInfo } from "../blockScan";
 
 const defaultCast: CastingFunction = (columnValue, context) => {
   if (context.column === "timestamp") {
@@ -45,8 +46,23 @@ export const storeParsedCsv = async (
   const parser = await getCommonParser(data.pathToFile, data.headers, cast);
   for await (const record of parser) {
     try {
-      await model.create(record);
-      counter++;
+      let user;
+      if (
+        type === ModelType.harvest ||
+        type === ModelType.withdraw ||
+        type === ModelType.updateLiquidity
+      ) {
+        user = await getUserFromUserPositionInfo(record.tokenId, record.block);
+      } else {
+        const tokenId = JSON.parse(record.params).tokenId;
+        user = await getUserFromUserPositionInfo(tokenId, record.block);
+      }
+      if (user) {
+        await model.create(Object.assign({ user }, record));
+        counter++;
+      } else {
+        console.log(`Cannot save ${type} ${record.tx}`);
+      }
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);

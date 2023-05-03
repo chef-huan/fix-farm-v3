@@ -40,7 +40,7 @@ export const getDecreaseLiquiditySchema = (): Schema => {
     }
   );
 
-  schema.index({ tx: 1, params: 1 }, { unique: true });
+  schema.index({ tx: 1, user: 1, params: 1 }, { unique: true });
 
   return schema;
 };
