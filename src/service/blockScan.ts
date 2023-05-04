@@ -1,7 +1,13 @@
-import { ethers, utils } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import { getProvider } from "./provider";
 import MasterChefV3 from "../blockchain/abi/MasterChefV3.json";
-import { hexDataSlice } from "ethers/lib/utils";
+import PancakeV3LmPool from "../blockchain/abi/PancakeV3LmPool.json";
+import { Deposit } from "../model/graphData";
+
+const uint256MaxDiv2 = BigNumber.from(
+  "57896044618658097711785492504343953926634992332820282019728792003956564819967"
+);
+const uint256Max = uint256MaxDiv2.mul(2);
 
 const masterChefV3Contract = new ethers.Contract(
   "0x556B9306565093C855AEA9AE92A594704c2Cd59e",
@@ -30,42 +36,41 @@ export const getUserFromUserPositionInfo = async (
   return result?.user?.toLowerCase();
 };
 
-const iMasterChefV3 = new ethers.utils.Interface(MasterChefV3);
+const updateInfectedDeposit = async (
+  deposit: Deposit,
+  functionCallBlockNumber: number
+) => {
+  // 2.Use call to check the new reward growth number from lmPool
+  const lmPoolContract = new ethers.Contract(
+    deposit.lmPool,
+    PancakeV3LmPool,
+    getProvider(56)
+  );
+  const rewardGrowthInside =
+    await lmPoolContract.functions.getRewardGrowthInside(
+      deposit.tickLower,
+      deposit.tickUpper,
+      {
+        blockTag: functionCallBlockNumber,
+      }
+    );
 
-const startBlock = 26933904;
+  const rewardGrowthInsideX128 = BigNumber.from(
+    rewardGrowthInside.rewardGrowthInsideX128
+  );
 
-const lastSyncBlock = 27847089;
-
-export const indexing = async () => {
-  const provider = getProvider(56);
-
-  const filter = {
-    address: "0x556B9306565093C855AEA9AE92A594704c2Cd59e",
-    fromBlock: startBlock,
-    toBlock: startBlock + 1000,
-  };
-  // await provider.getLogs(filter).then(async (logs) => {
-  //   console.log(`SIZE of logs: ${logs.length}`);
-  //   for (let log of logs) {
-  //     const parsed = iMasterChefV3.parseLog(log);
-  //     console.log(log);
-  //     console.log(parsed);
-  //   }
-  // });
-
-  for (let i = startBlock; i < startBlock + 1000; i++) {
-    provider.getBlockWithTransactions(i).then((result) => {
-      result.transactions.forEach((tx, index) => {
-        // console.log(`startBlock: ${i}. tx index: ${index}`);
-        try {
-          const parsedTx = iMasterChefV3.parseTransaction(tx);
-          ethers.utils.defaultAbiCoder.decode(
-            ["bytes", "string"],
-            hexDataSlice(tx.data, 4)
-          );
-          console.log(parsedTx);
-        } catch (ignore) {}
-      });
-    });
+  //3. Check if `rewardGrowthInside` is still larger than `uint256Max / 2`
+  if (rewardGrowthInsideX128.gt(uint256MaxDiv2)) {
+  } else {
+    //If false, we need to perform manual accounting and reward calculation
+    //a. Calculate the offset between the previous rewardGrowthInside and uint256Max
+    const rewardPartOne = uint256Max
+      .sub(BigNumber.from(deposit.rewardGrowthInside))
+      .add(1);
+    const rewardPartTwo = rewardGrowthInsideX128;
+    // const rewardTotal = rewardPartOne
+    //   .add(rewardPartTwo)
+    //   .mul(deposit.boostLiquidity)
+    //   .div(Q128);
   }
 };
