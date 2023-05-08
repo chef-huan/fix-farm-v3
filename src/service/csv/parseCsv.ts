@@ -4,6 +4,7 @@ import { CastingFunction, parse, Parser } from "csv-parse";
 import { getModel, ModelType } from "../../db/mongodb/mongo";
 import { configMap } from "./configCsv";
 import { getUserFromUserPositionInfo } from "../blockScan";
+import { equalsIgnoreCase } from "../../util";
 
 const defaultCast: CastingFunction = (columnValue, context) => {
   if (context.column === "timestamp") {
@@ -31,6 +32,7 @@ const getCommonParser = async (
 
 export const storeParsedCsv = async (
   type: ModelType,
+  networkId: number,
   cast?: CastingFunction
 ) => {
   console.log(`storeParsedCsv started. type: ${type}`);
@@ -52,10 +54,18 @@ export const storeParsedCsv = async (
         type === ModelType.withdraw ||
         type === ModelType.updateLiquidity
       ) {
-        user = await getUserFromUserPositionInfo(record.tokenId, record.block);
+        user = await getUserFromUserPositionInfo(
+          record.tokenId,
+          record.block - 1,
+          networkId
+        );
       } else {
         const tokenId = JSON.parse(record.params).tokenId;
-        user = await getUserFromUserPositionInfo(tokenId, record.block);
+        user = await getUserFromUserPositionInfo(
+          tokenId,
+          record.block - 1,
+          networkId
+        );
       }
       if (user) {
         await model.create(Object.assign({ user }, record));

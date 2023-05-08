@@ -4,17 +4,17 @@ import { fixDeposits } from "./service/fixDeposit";
 
 const init = async () => {
   console.log("Init");
-  // await Promise.all([
-  //   storeParsedCsv(ModelType.updateLiquidity),
-  //   storeParsedCsv(ModelType.increaseLiquidity),
-  //   storeParsedCsv(ModelType.decreaseLiquidity),
-  //   storeParsedCsv(ModelType.withdraw),
-  //   storeParsedCsv(ModelType.harvest),
-  // ]);
+  await Promise.all([
+    // storeParsedCsv(ModelType.updateLiquidity),
+    // storeParsedCsv(ModelType.increaseLiquidity),
+    // storeParsedCsv(ModelType.decreaseLiquidity),
+    // storeParsedCsv(ModelType.withdraw),
+    // storeParsedCsv(ModelType.harvest),
+  ]);
 };
 
 init().then(async () => {
   console.log("Init finished");
 
-  await fixDeposits();
+  await fixDeposits(56);
 });

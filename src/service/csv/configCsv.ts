@@ -6,12 +6,12 @@ export const configMap = new Map<
 >();
 
 configMap.set(ModelType.updateLiquidity, {
-  pathToFile: "input/bsc/updateLiquidityFunctionCall.csv",
+  pathToFile: "input/bsc-test/updateLiquidityFunctionCall.csv",
   headers: ["tx", "timestamp", "block", "tokenId"],
 });
 
 configMap.set(ModelType.increaseLiquidity, {
-  pathToFile: "input/bsc/increaseLiquidityFunctionCall.csv",
+  pathToFile: "input/bsc-test/increaseLiquidityFunctionCall.csv",
   headers: [
     "tx",
     "timestamp",
@@ -24,7 +24,7 @@ configMap.set(ModelType.increaseLiquidity, {
 });
 
 configMap.set(ModelType.decreaseLiquidity, {
-  pathToFile: "input/bsc/decreaseLiquidityFunctionCall.csv",
+  pathToFile: "input/bsc-test/decreaseLiquidityFunctionCall.csv",
   headers: [
     "tx",
     "timestamp",
@@ -36,11 +36,11 @@ configMap.set(ModelType.decreaseLiquidity, {
 });
 
 configMap.set(ModelType.withdraw, {
-  pathToFile: "input/bsc/withdrawFunctionCall.csv",
+  pathToFile: "input/bsc-test/withdrawFunctionCall.csv",
   headers: ["tx", "timestamp", "block", "to", "tokenId", "output_reward"],
 });
 
 configMap.set(ModelType.harvest, {
-  pathToFile: "input/bsc/harvestFunctionCall.csv",
+  pathToFile: "input/bsc-test/harvestFunctionCall.csv",
   headers: ["tx", "timestamp", "block", "to", "tokenId", "output_reward"],
 });

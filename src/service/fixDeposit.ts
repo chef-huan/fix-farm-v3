@@ -1,10 +1,7 @@
 import { getModel, ModelType } from "../db/mongodb/mongo";
 import { getAffectedDepositsNextPages } from "./subgraph";
-
-type MethodCall = {
-  type: ModelType;
-  block: number;
-};
+import { MethodCall } from "../model/fixedDeposit";
+import { updateInfectedDeposit } from "./blockScan";
 
 const getMethodsCall = async (
   user: string,
@@ -43,41 +40,28 @@ const getMethodsCall = async (
   ].sort((a, b) => a.block - b.block);
 };
 
-export const fixDeposits = async () => {
-  let affectedDeposits = await getAffectedDepositsNextPages(56);
-
-  let counterWithMethods = 0;
-  let counterNoMethods = 0;
+export const fixDeposits = async (networkId: number) => {
+  console.log("Start fixDeposits");
+  let affectedDeposits = await getAffectedDepositsNextPages(networkId);
 
   let allFetched = false;
   while (!allFetched) {
     for (const affectedDeposit of affectedDeposits) {
-      const methodsCall: MethodCall[] = await getMethodsCall(
+      const methodsCalls: MethodCall[] = await getMethodsCall(
         affectedDeposit.user.id,
         affectedDeposit.block
       );
-      if (methodsCall.length === 0) {
-        counterNoMethods++;
-      } else {
-        counterWithMethods++;
-        if (methodsCall.length > 1) {
-          console.log(
-            `${affectedDeposit.id}, methodsCall.length ${methodsCall.length}`
-          );
-        }
-      }
+      await updateInfectedDeposit(affectedDeposit, methodsCalls, networkId);
     }
     if (affectedDeposits.length < 1000) {
       allFetched = true;
     } else {
       affectedDeposits = await getAffectedDepositsNextPages(
-        56,
+        networkId,
         affectedDeposits[affectedDeposits.length - 1].timestamp
       );
     }
   }
 
-  console.log(
-    `Fix finished. counterWithMethods ${counterWithMethods}. counterNoMethods: ${counterNoMethods}`
-  );
+  console.log("Finished fixDeposits");
 };
